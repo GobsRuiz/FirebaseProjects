@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-app.js"></script>
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+        https://firebase.google.com/docs/web/setup#available-libraries -->
+    <script src="https://www.gstatic.com/firebasejs/8.9.1/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-database.js"></script>
+    <script>
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    var firebaseConfig = {
+        apiKey: "AIzaSyB0W9rnEALKgGIHTP1srVCokmfDStTl3d8",
+        authDomain: "estudo-web-c126d.firebaseapp.com",
+        projectId: "estudo-web-c126d",
+        storageBucket: "estudo-web-c126d.appspot.com",
+        messagingSenderId: "1021334616369",
+        appId: "1:1021334616369:web:be78101c774e08a70e1810",
+        measurementId: "G-RL4M6BCNSC",
+        databaseURL: "https://estudo-web-c126d-default-rtdb.firebaseio.com/"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+    </script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body id="dash_body">
+    <header id="dash_header">
+        <nav>
+            <a href="index.html">
+                Início
+            </a>
+            <a href="contact.html">
+                Contatos
+            </a>
+            <a href="#" class="dash_header_linkActive">
+                Funcionários
+            </a>
+        </nav>
+    </header>
+
+    <main id="dash_main">
+        <button id="registerBtn">
+            Cadastrar
+        </button>
+
+        <div id="dash_main_table" class="dash_main_container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>
+                            Nome
+                        </th>
+                        <th>
+                            Cargo
+                        </th>
+                        <th>
+                            Data de admissão
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        let database = firebase.database();
+        let employesRef = database.ref("/funcionarios/");
+        
+        function employees_db() {
+            function registerData(){
+                let submitBtn = document.getElementById("");
+
+                submitBtn.addEventListener("click", e => {
+                    e.preventDefault()
+
+                    let result_checkRegistration = ""
+                    let values = {
+                        fullname: document.querySelector("#employees_modalRegister input[name=fullname]").value,
+                        office: document.querySelector("#employees_modalRegister input[name=office]").value,
+                        cpf: document.querySelector("#employees_modalRegister input[name=cpf]").value,
+                        birthDate: document.querySelector("#employees_modalRegister input[name=birthDate]").value
+                    }
+
+                    let id = getKey()
+
+                    setTimeout(() => {
+                        saveData(id, values)
+                        
+                        setTimeout(() => {
+                            result_checkRegistration = checkRegistration(id, values) 
+                            showMessage(result_checkRegistration) 
+                        }, 100);
+                    }, 500);
+                })
+
+
+                function saveData(id, values){
+                    employeeRef.child(id).set({
+                        fullname: values.fullname,
+                        office: values.office,
+                        cpf: values.cpf,
+                        birthDate: values.birthDate
+                    })
+                }
+            
+            
+                function getKey() {
+                    let id = 0;
+            
+                    database.ref('/employees').on("child_added", data => {
+                        if(data.key > id){
+                            id = data.key;
+                        }
+                    })
+                    
+                    id = parseInt(id) + 1;
+                    return id;
+                }
+
+
+                function checkRegistration(id, values) {
+                    let result = "";
+
+                    database.ref('/employees').on("child_added", data => {
+                        if(data.key == id){
+                            result = data.val().cpf == values.cpf;
+                        }
+                    })
+
+                    return result;
+                }
+
+                function showMessage(result){
+                    let tagMessage = document.getElementById("employees_modalRegister_message");
+                    
+                    tagMessage.style.display = "block";
+
+                    if(result == true){
+                        tagMessage.classList.add("modalFormRegister_message_success")
+                        tagMessage.innerText = "Funcionário cadastrado!";
+                    }else{
+                        tagMessage.classList.add("modalFormRegister_message_failed")
+                        tagMessage.innerText = "O cadastro não foi realizado!";
+                    }
+                }
+
+                setTimeout(() => {
+                    getKey()
+                }, 500);
+            }
+            registerData()
+
+            function getData() {
+                let tbody = document.querySelector("tbody")
+
+                employesRef.on('value', (snapshot) => {
+                    for (let i = 0; i < snapshot.val().length; i++) {
+                        let data = snapshot.val()[i]
+
+                        if(data != undefined){
+                            let tr = document.createElement("tr");
+                            let td_username = document.createElement("td")
+                            let td_email = document.createElement("td")
+                            
+                            td_username.dataset.label = "Nome";
+                            td_email.dataset.label = "E-mail";
+                            
+                            td_username.innerText = data.username;
+                            td_email.innerText = data.email;
+                            
+                            tr.appendChild(td_username)
+                            tr.appendChild(td_email)
+                            tbody.appendChild(tr)
+                        }
+                    }
+                })
+            }
+            getData()
+        }
+        employees_db()
+    </script>
+</body>
+</html>

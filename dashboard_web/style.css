@@ -100,6 +100,23 @@ a{
 
 
 
+/* Register btn */
+#registerBtn{
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: bold;
+    background-color: #00BFFF;
+    border: 0;
+    cursor: pointer;
+    border-radius: 10px;
+    padding: 10px 20px;
+    margin-bottom: 10px;
+}
+
+
+
+
+
 /* Table */
 #dash_main_table{
     background-color: #fff;
@@ -115,10 +132,15 @@ a{
 }
 
 #dash_main_table table tr:nth-of-type(odd){
-    background-color: #ebebeb;
+    background-color: #eeeeee;
+}
+#dash_main_table table tr:hover{
+    color: #fff;
+    background-color: #00BFFF;
 }
 
 #dash_main_table table tr th{
+    color: #fff;
     background-color: #00BFFF;
 }
 
@@ -212,6 +234,7 @@ a{
     }
 }
 
+/* 380 */
 @media(max-width: 380px){
     /* Main */
     /* Table */
